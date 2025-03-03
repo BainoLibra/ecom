@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="app.js">
+</head>
+<body>
+    <header>
+        <h1>Detergent Store</h1>
+        <nav class="navbar">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="shop.html">Shop</a></li>
+                <li><a href="cart.html">Cart</a></li>
+                <li><a href="checkout.html">Checkout</a></li>
+            </ul>
+            <div class="icon-cart">
+                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"/>
+                </svg>
+                <span>0</span>                  
+            </div>
+        </nav>
+    </header>
+    <section class="product-lists">
+        <h2>Featured Products</h2>
+        <div id="product-one">
+            <div class="product-card1">
+                <img src="images/image4.jpg" alt="Product" class="product-image">
+                <h3 class="product-title">disinfection equipment</h3>
+                <p class="product-price">$10.99</p>
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+
+            <div class="product-card2">
+                <img src="images/image3.jpg" alt="Product" class="product-image">
+                <h3 class="product-title">Sanitizer</h3>
+                <p class="product-price">$10.99</p>
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+
+            <div class="product-card3">
+                <img src="images/image5.jpg" alt="Product" class="product-image">
+                <h3 class="product-title">chemical cleaning tools</h3>
+                <p class="product-price">$10.99</p>
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+        </div>
+        <!-- Add more product cards here -->
+        <div id="product-two">
+            <div class="product-card4">
+                <img src="images/image1.jpg" alt="Product" class="product-image">
+                <h3 class="product-title">towel & sponge</h3>
+                <p class="product-price">$10.99</p>
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+
+            <div class="product-card5">
+                <img src="images/image6.jpg" alt="Product" class="product-image">
+                <h3 class="product-title">liquid soap</h3>
+                <p class="product-price">$10.99</p>
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+
+            <div class="product-card6">
+                <img src="images/image2.jpg" alt="Product" class="product-image">
+                <h3 class="product-title">jik</h3>
+                <p class="product-price">$10.99</p>
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+        </div>
+    </section>
+    <main>
+        <div>
+            <form id="delivery-form">
+                <label for="delivery-date">Select Delivery Date:</label>
+                <input type="date" id="delivery-date" name="delivery-date" required>
+              
+                <label for="delivery-location">Enter Delivery Location:</label>
+                <input type="text" id="delivery-location" name="delivery-location" required>
+              
+                <button type="submit">Book Delivery</button>
+              </form>
+           </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 Detergent Store. All Rights Reserved.</p>
+    </footer>
+    
+    <script src="script.js"></script>
+</body>
+</html>
+
+<!-- Express.js Backend -->
+<script>
+    const express = require('express');
+    const sqlite3 = require('sqlite3').verbose();
+    const app = express();
+    const port = 3000;
+
+    const db = new sqlite3.Database('./store.db', (err) => {
+        if (err) {
+            console.error(err.message);
+        } else {
+            console.log('Connected to SQLite database.');
+        }
+    });
+
+    app.use(express.json());
+
+    app.get('/products', (req, res) => {
+        db.all('SELECT * FROM products', [], (err, rows) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+            } else {
+                res.json(rows);
+            }
+        });
+    });
+
+    app.listen(port, () => {
+        console.log(`Server running on http://localhost:${port}`);
+    });
+
+    document.addEventListener('DOMContentLoaded', () =>{
+        const addToCartButtons =document.querySelectorAll('.add-to-cart');
+        const cartItemCount =document.querySelector('.icon-cart span');
+        
+        let cartItems =[];
+        addToCartButtons.forEach((button, index) =>{
+            button.addEventListener('click',()=>{
+                const itemName= document.querySelectorAll('.product-title')[index].textContent;
+                const itemPrice= parseFloat(
+                        document.querySelectorAll('.product-price')[index].textContent.slice[1],
+                    );
+                const existingItem =cartItems.find(
+                    (cartItem) => cartItem.name ===itemName,
+                );
+                if (existingItem){
+                    existingItem.quantity++;
+                }else{
+                    cartItems.push({name: itemName, price: itemPrice, quantity: 1})
+                }
+                const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+                cartItemCount.textContent = totalItems;
+            })
+        })
+    })
+</script>
+</body>
+</html>
